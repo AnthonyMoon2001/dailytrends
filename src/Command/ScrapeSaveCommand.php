@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[
     AsCommand(
-        name: "app:scrape:save",
+        name: "command:SaveFeeds",
         description: "Obtiene y guarda en MySQL las 5 noticias"
     )
 ]
