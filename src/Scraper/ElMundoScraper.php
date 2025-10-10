@@ -4,7 +4,9 @@ namespace App\Scraper;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('app.scraper')]
 final class ElMundoScraper implements ScraperInterface
 {
     private const BASE = "https://www.elmundo.es";

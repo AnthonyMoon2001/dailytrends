@@ -12,9 +12,4 @@ services:
       - '../src/Entity/'
       - '../src/Kernel.php'
 
-  App\Scraper\ElPaisScraper:
-    tags: ['app.scraper']
-
-  App\Scraper\ElMundoScraper:
-    tags: ['app.scraper']
 
