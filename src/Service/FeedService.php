@@ -52,11 +52,12 @@ final class FeedService
         );
     }
 
-    public function delete(int $id, bool $idempotent = true): void
+    public function delete(int $id): array
     {
         $affected = $this->repository->deleteById($id);
-        if ($affected === 0 && !$idempotent) {
-            throw new NotFoundHttpException(sprintf('Feed %d not found', $id));
+        if (!$affected) {
+            return ['ERROR' => 'No existe ninuna noticia con esa id'];
         }
+        return ['OK' => 'Ha sido eliminada correectamente'];
     }
 }

@@ -33,10 +33,8 @@ final class FeedController extends AbstractController
     }
 
     #[Route('/{id<\d+>}', name: 'feeds_delete', methods: ['DELETE'])]
-    public function delete(int $id): Response
+    public function delete(int $id): JsonResponse
     {
-        $this->service->delete($id, true);
-
-        return new Response("null", Response::HTTP_NO_CONTENT);
+        return  $this->json($this->service->delete($id));
     }
 }
