@@ -2,7 +2,6 @@ nelmio_api_doc:
   documentation:
     info:
       title: DailyTrends API
-      description: API REST CRUD de feeds (El País / El Mundo)
       version: 1.0.0
   areas:
     path_patterns:

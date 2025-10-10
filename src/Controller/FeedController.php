@@ -172,18 +172,18 @@ final class FeedController extends AbstractController
 
         $constraints = new Assert\Collection(
             fields: [
-                "title" => [new Assert\NotBlank(), new Assert\Length(max: 255)],
-                "url" => [
+                'title' => [new Assert\NotBlank(), new Assert\Length(max: 255)],
+                'url' => [
                     new Assert\NotBlank(),
-                    new Assert\Url(),
+                    new Assert\Url(requireTld: true, protocols: ['http', 'https']),
                     new Assert\Length(max: 1024),
                 ],
-                "source" => [new Assert\NotBlank(), new Assert\Length(max: 50)],
-                "image" => new Assert\Optional([
-                    new Assert\Url(),
+                'source' => [new Assert\NotBlank(), new Assert\Length(max: 50)],
+                'image' => new Assert\Optional([
+                    new Assert\Url(requireTld: true, protocols: ['http', 'https']),
                     new Assert\Length(max: 1024),
                 ]),
-                "publishedAt" => new Assert\Optional([new Assert\Date()]),
+                'publishedAt' => new Assert\Optional([new Assert\Date()]),
             ],
             allowExtraFields: false
         );
@@ -305,18 +305,18 @@ final class FeedController extends AbstractController
 
         $constraints = new Assert\Collection(
             fields: [
-                "title" => [new Assert\NotBlank(), new Assert\Length(max: 255)],
-                "url" => [
+                'title' => [new Assert\NotBlank(), new Assert\Length(max: 255)],
+                'url' => [
                     new Assert\NotBlank(),
-                    new Assert\Url(),
+                    new Assert\Url(requireTld: true, protocols: ['http', 'https']),
                     new Assert\Length(max: 1024),
                 ],
-                "source" => [new Assert\NotBlank(), new Assert\Length(max: 50)],
-                "image" => new Assert\Optional([
-                    new Assert\Url(),
+                'source' => [new Assert\NotBlank(), new Assert\Length(max: 50)],
+                'image' => new Assert\Optional([
+                    new Assert\Url(requireTld: true, protocols: ['http', 'https']),
                     new Assert\Length(max: 1024),
                 ]),
-                "publishedAt" => new Assert\Optional([new Assert\Date()]),
+                'publishedAt' => new Assert\Optional([new Assert\Date()]),
             ],
             allowExtraFields: false
         );

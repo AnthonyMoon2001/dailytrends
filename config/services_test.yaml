@@ -1,0 +1,5 @@
+services:
+  logger:
+    class: Psr\Log\NullLogger
+
+  Psr\Log\LoggerInterface: '@logger'
