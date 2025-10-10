@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\DTO\FeedResponseDto;
-use App\Entity\News;
+use App\Entity\Feeds;
 use App\Queries\ListQuery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Repository\FeedsRepository;
 
 final class FeedService
 {
-    public function __construct(private ListQuery $listQuery) {}
+    public function __construct(private ListQuery $listQuery, private FeedsRepository $repository,) {}
 
     /** @return array */
     public function list(): array
     {
         $rows = $this->listQuery->execute();
 
-        $items = array_map(fn(News $n) => $this->mapToDto($n), $rows);
+        $items = array_map(fn(Feeds $n) => $this->mapToDto($n), $rows);
 
         return [
             'items' => $items,
@@ -35,7 +36,7 @@ final class FeedService
         return ['item' => $this->mapToDto($n)];
     }
 
-    private function mapToDto(News $n): FeedResponseDto
+    private function mapToDto(Feeds $n): FeedResponseDto
     {
         return new FeedResponseDto(
             id: (int) $n->getId(),
@@ -47,5 +48,13 @@ final class FeedService
             createdAt: $n->getCreatedAt()->format(\DateTimeInterface::ATOM),
             updatedAt: $n->getUpdatedAt()->format(\DateTimeInterface::ATOM),
         );
+    }
+
+    public function delete(int $id, bool $idempotent = true): void
+    {
+        $affected = $this->repository->deleteById($id);
+        if ($affected === 0 && !$idempotent) {
+            throw new NotFoundHttpException(sprintf('Feed %d not found', $id));
+        }
     }
 }

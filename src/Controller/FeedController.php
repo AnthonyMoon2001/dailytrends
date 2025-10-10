@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 #[Route('/feeds')]
 final class FeedController extends AbstractController
@@ -29,5 +30,13 @@ final class FeedController extends AbstractController
     public function show(int $id): JsonResponse
     {
         return $this->json($this->service->get($id));
+    }
+
+    #[Route('/{id<\d+>}', name: 'feeds_delete', methods: ['DELETE'])]
+    public function delete(int $id): Response
+    {
+        $this->service->delete($id, true);
+
+        return new Response("null", Response::HTTP_NO_CONTENT);
     }
 }

@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\News;
+use App\Entity\Feeds;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 
-final class NewsRepository extends ServiceEntityRepository
+final class FeedsRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
         private LoggerInterface $logger
     ) {
-        parent::__construct($registry, News::class);
+        parent::__construct($registry, Feeds::class);
     }
 
-    public function findOneBySourceAndUrl(string $source, string $url): ?News
+    public function findOneBySourceAndUrl(string $source, string $url): ?Feeds
     {
         return $this->findOneBy(["source" => $source, "url" => $url]);
     }
@@ -40,27 +40,27 @@ final class NewsRepository extends ServiceEntityRepository
                     : null;
                 $urlHash   = hash('sha256', $normUrl);
 
-                $news = $this->findOneBy([
+                $feeds = $this->findOneBy([
                     'source'  => (string)$i['source'],
                     'urlHash' => $urlHash,
                 ]);
 
-                if ($news) {
-                    $news->updateFrom(
+                if ($feeds) {
+                    $feeds->updateFrom(
                         (string)$i['title'],
                         $normImage,
                         $i['publishedAt'] instanceof \DateTimeImmutable ? $i['publishedAt'] : null
                     );
                     $updated++;
                 } else {
-                    $news = new News(
+                    $feeds = new Feeds(
                         (string)$i['title'],
                         $normUrl,
                         $normImage,
                         $i['publishedAt'] instanceof \DateTimeImmutable ? $i['publishedAt'] : null,
                         (string)$i['source']
                     );
-                    $em->persist($news);
+                    $em->persist($feeds);
                     $inserted++;
                 }
             }
@@ -68,7 +68,6 @@ final class NewsRepository extends ServiceEntityRepository
             $em->flush();
             $em->commit();
         } catch (\Throwable $e) {
-            dd($e);
             $em->rollback();
             $errors = count($items);
             $inserted = 0;
@@ -76,5 +75,16 @@ final class NewsRepository extends ServiceEntityRepository
         }
 
         return ['inserted' => $inserted, 'updated' => $updated, 'errors' => $errors];
+    }
+
+
+    public function deleteById(int $id): int
+    {
+        return $this->createQueryBuilder('n')
+            ->delete()
+            ->where('n.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->execute();
     }
 }

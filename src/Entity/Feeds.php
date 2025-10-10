@@ -2,18 +2,18 @@
 
 namespace App\Entity;
 
-use App\Repository\NewsRepository;
+use App\Repository\FeedsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: NewsRepository::class)]
-#[ORM\Table(name: "news")]
+#[ORM\Entity(repositoryClass: FeedsRepository::class)]
+#[ORM\Table(name: "feeds")]
 #[
     ORM\UniqueConstraint(
         name: "uniq_source_urlhash",
         columns: ["source", "url_hash"]
     )
 ]
-class News
+class Feeds
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Scraper\ScrapeAndSaveTopNews;
+use App\Scraper\ScrapeAndSaveTopFeeds;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 ]
 final class ScrapeSaveCommand extends Command
 {
-    public function __construct(private ScrapeAndSaveTopNews $useCase)
+    public function __construct(private ScrapeAndSaveTopFeeds $useCase)
     {
         parent::__construct();
     }

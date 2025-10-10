@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Queries;
 
-use App\Entity\News;
-use App\Repository\NewsRepository;
+use App\Entity\Feeds;
+use App\Repository\FeedsRepository;
 
 final class ListQuery
 {
-    public function __construct(private NewsRepository $repo) {}
+    public function __construct(private FeedsRepository $repo) {}
 
     public function execute(): array
     {
@@ -19,7 +19,7 @@ final class ListQuery
             ->getResult();
     }
 
-    public function findOneById(int $id): ?News
+    public function findOneById(int $id): ?Feeds
     {
         return $this->repo->find($id);
     }

@@ -2,17 +2,17 @@
 
 namespace App\Scraper;
 
-use App\Repository\NewsRepository;
+use App\Repository\FeedsRepository;
 use App\Scraper\ScraperInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
-final class ScrapeAndSaveTopNews
+final class ScrapeAndSaveTopFeeds
 {
     /** @param iterable<ScraperInterface> $scrapers */
     public function __construct(
         #[TaggedIterator('app.scraper')] private iterable $scrapers,
-        private NewsRepository $repo,
+        private FeedsRepository $repo,
         private LoggerInterface $logger,
     ) {}
 
