@@ -58,7 +58,7 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
-    command: ["sleep", "infinity"]  # entra cuando lo necesites con exec
+    command: ["sleep", "infinity"] 
 
 volumes:
   mysql_data:

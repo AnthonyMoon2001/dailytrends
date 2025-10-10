@@ -6,7 +6,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('app.scraper')]
+#[AutoconfigureTag("app.scraper")]
 final class ElMundoScraper implements ScraperInterface
 {
     private const BASE = "https://www.elmundo.es";
@@ -58,8 +58,8 @@ final class ElMundoScraper implements ScraperInterface
                 HtmlUtils::absolutize($href, self::BASE)
             );
 
-            $normUrl = mb_substr($url, 0, 1024);       // mismo truncado que la entidad
-            $key     = hash('sha256', $normUrl);       // o simplemente $key = $normUrl
+            $normUrl = mb_substr($url, 0, 1024);
+            $key = hash("sha256", $normUrl);
 
             if (isset($seen[$key])) {
                 continue;

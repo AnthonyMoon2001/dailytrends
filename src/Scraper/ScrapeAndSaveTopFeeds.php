@@ -5,13 +5,13 @@ namespace App\Scraper;
 use App\Repository\FeedsRepository;
 use App\Scraper\ScraperInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class ScrapeAndSaveTopFeeds
 {
-    /** @param iterable<ScraperInterface> $scrapers */
+    /** @param iterable<ScraperInterface>*/
     public function __construct(
-        #[TaggedIterator('app.scraper')] private iterable $scrapers,
+        #[AutowireIterator(tag: 'app.scraper')] private iterable $scrapers,
         private FeedsRepository $repo,
         private LoggerInterface $logger,
     ) {}
@@ -29,6 +29,7 @@ final class ScrapeAndSaveTopFeeds
                     'source' => $scraper->sourceKey(),
                     'exception' => $e
                 ]);
+
                 $summary[$scraper->sourceKey()] = ['inserted' => 0, 'updated' => 0, 'errors' => 5];
             }
         }
