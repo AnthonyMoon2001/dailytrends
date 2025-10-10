@@ -1,0 +1,19 @@
+# dependencias / build
+/vendor/
+var/
+node_modules/
+public/build/
+public/bundles/
+
+# entornos locales (¡no subas secretos!)
+.env.local
+.env.*.local
+.php-cs-fixer.cache
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+
+# docker opcional
+docker-compose.override.yml
