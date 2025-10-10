@@ -33,32 +33,36 @@ final class FeedsRepository extends ServiceEntityRepository
         $em->beginTransaction();
         try {
             foreach ($items as $i) {
-
-                $normUrl   = mb_substr((string)$i['url'], 0, 1024);
-                $normImage = isset($i['image']) && $i['image'] !== null
-                    ? mb_substr((string)$i['image'], 0, 1024)
+                $normUrl = mb_substr((string) $i["url"], 0, 1024);
+                $normImage =
+                    isset($i["image"]) && $i["image"] !== null
+                    ? mb_substr((string) $i["image"], 0, 1024)
                     : null;
-                $urlHash   = hash('sha256', $normUrl);
+                $urlHash = hash("sha256", $normUrl);
 
                 $feeds = $this->findOneBy([
-                    'source'  => (string)$i['source'],
-                    'urlHash' => $urlHash,
+                    "source" => (string) $i["source"],
+                    "urlHash" => $urlHash,
                 ]);
 
                 if ($feeds) {
                     $feeds->updateFrom(
-                        (string)$i['title'],
+                        (string) $i["title"],
                         $normImage,
-                        $i['publishedAt'] instanceof \DateTimeImmutable ? $i['publishedAt'] : null
+                        $i["publishedAt"] instanceof \DateTimeImmutable
+                            ? $i["publishedAt"]
+                            : null
                     );
                     $updated++;
                 } else {
                     $feeds = new Feeds(
-                        (string)$i['title'],
+                        (string) $i["title"],
                         $normUrl,
                         $normImage,
-                        $i['publishedAt'] instanceof \DateTimeImmutable ? $i['publishedAt'] : null,
-                        (string)$i['source']
+                        $i["publishedAt"] instanceof \DateTimeImmutable
+                            ? $i["publishedAt"]
+                            : null,
+                        (string) $i["source"]
                     );
                     $em->persist($feeds);
                     $inserted++;
@@ -71,20 +75,30 @@ final class FeedsRepository extends ServiceEntityRepository
             $em->rollback();
             $errors = count($items);
             $inserted = 0;
-            $updated  = 0;
+            $updated = 0;
         }
 
-        return ['inserted' => $inserted, 'updated' => $updated, 'errors' => $errors];
+        return [
+            "inserted" => $inserted,
+            "updated" => $updated,
+            "errors" => $errors,
+        ];
     }
-
 
     public function deleteById(int $id): int
     {
-        return $this->createQueryBuilder('n')
+        return $this->createQueryBuilder("n")
             ->delete()
-            ->where('n.id = :id')
-            ->setParameter('id', $id)
+            ->where("n.id = :id")
+            ->setParameter("id", $id)
             ->getQuery()
             ->execute();
+    }
+
+    public function save(Feeds $entity): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($entity);
+        $em->flush();
     }
 }
