@@ -117,7 +117,6 @@ final class FeedController extends AbstractController
             image: $data["image"] ?? null,
             publishedAt: $publishedAt,
             source: (string) $data["source"],
-            idempotent: true
         );
 
         return $this->json($result);

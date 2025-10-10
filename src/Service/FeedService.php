@@ -72,7 +72,6 @@ final class FeedService
         ?string $image,
         ?\DateTimeImmutable $publishedAt,
         string $source,
-        bool $idempotent = true
     ): array {
         $normUrl = mb_substr(trim($url), 0, 1024);
         $normImage = $image ? mb_substr(trim($image), 0, 1024) : null;
