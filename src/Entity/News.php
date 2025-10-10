@@ -68,6 +68,52 @@ class News
         $this->updatedAt = $now;
     }
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    public function getUrlHash(): string
+    {
+        return $this->urlHash;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function getPublishedAt(): ?\DateTimeImmutable
+    {
+        return $this->publishedAt;
+    }
+
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+
     public function updateFrom(
         string $title,
         ?string $image,

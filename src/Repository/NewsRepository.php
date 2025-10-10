@@ -27,57 +27,54 @@ final class NewsRepository extends ServiceEntityRepository
     public function upsertMany(array $items): array
     {
         $em = $this->getEntityManager();
-        $inserted = $updated = $errors = 0;
-
+        $inserted = 0;
+        $updated = 0;
+        $errors = 0;
         $em->beginTransaction();
         try {
-            foreach ($items as $it) {
-                try {
-                    $source = (string) ($it["source"] ?? "");
-                    $url = (string) ($it["url"] ?? "");
-                    $title = (string) ($it["title"] ?? "");
-                    if ($source === "" || $url === "" || $title === "") {
-                        $errors++;
-                        continue;
-                    }
+            foreach ($items as $i) {
 
-                    $existing = $this->findOneBySourceAndUrl($source, $url);
-                    if ($existing) {
-                        $existing->updateFrom(
-                            $title,
-                            $it["image"] ?? null,
-                            $it["publishedAt"] ?? null
-                        );
-                        $updated++;
-                    } else {
-                        $news = new News(
-                            $title,
-                            $url,
-                            $it["image"] ?? null,
-                            $it["publishedAt"] ?? null,
-                            $source
-                        );
-                        $em->persist($news);
-                        $inserted++;
-                    }
-                } catch (\Throwable $e) {
-                    $errors++;
-                    $this->logger->warning("News upsert error", [
-                        "exception" => $e,
-                        "item" => $it,
-                    ]);
+                $normUrl   = mb_substr((string)$i['url'], 0, 1024);
+                $normImage = isset($i['image']) && $i['image'] !== null
+                    ? mb_substr((string)$i['image'], 0, 1024)
+                    : null;
+                $urlHash   = hash('sha256', $normUrl);
+
+                $news = $this->findOneBy([
+                    'source'  => (string)$i['source'],
+                    'urlHash' => $urlHash,
+                ]);
+
+                if ($news) {
+                    $news->updateFrom(
+                        (string)$i['title'],
+                        $normImage,
+                        $i['publishedAt'] instanceof \DateTimeImmutable ? $i['publishedAt'] : null
+                    );
+                    $updated++;
+                } else {
+                    $news = new News(
+                        (string)$i['title'],
+                        $normUrl,
+                        $normImage,
+                        $i['publishedAt'] instanceof \DateTimeImmutable ? $i['publishedAt'] : null,
+                        (string)$i['source']
+                    );
+                    $em->persist($news);
+                    $inserted++;
                 }
             }
+
             $em->flush();
             $em->commit();
         } catch (\Throwable $e) {
+            dd($e);
             $em->rollback();
-            $this->logger->error("News upsert transaction failed", [
-                "exception" => $e,
-            ]);
-            throw $e;
+            $errors = count($items);
+            $inserted = 0;
+            $updated  = 0;
         }
 
-        return compact("inserted", "updated", "errors");
+        return ['inserted' => $inserted, 'updated' => $updated, 'errors' => $errors];
     }
 }

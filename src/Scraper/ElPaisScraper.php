@@ -68,7 +68,9 @@ final class ElPaisScraper implements ScraperInterface
                 continue;
             }
 
-            $key = $url . "|" . $title;
+            $normUrl = mb_substr($url, 0, 1024);
+            $key     = hash('sha256', $normUrl);
+
             if (isset($seen[$key])) {
                 continue;
             }

@@ -58,7 +58,9 @@ final class ElMundoScraper implements ScraperInterface
                 HtmlUtils::absolutize($href, self::BASE)
             );
 
-            $key = $url . "|" . $title;
+            $normUrl = mb_substr($url, 0, 1024);       // mismo truncado que la entidad
+            $key     = hash('sha256', $normUrl);       // o simplemente $key = $normUrl
+
             if (isset($seen[$key])) {
                 continue;
             }
