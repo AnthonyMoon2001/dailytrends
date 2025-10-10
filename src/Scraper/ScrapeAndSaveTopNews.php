@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Scraper;
 
 use App\Repository\NewsRepository;
 use App\Scraper\ScraperInterface;
