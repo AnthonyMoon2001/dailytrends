@@ -6,18 +6,20 @@ namespace App\Service;
 
 use App\DTO\FeedResponseDto;
 use App\Entity\Feeds;
-use App\Queries\ListQuery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Repository\FeedsRepository;
 
 final class FeedService
 {
-    public function __construct(private ListQuery $listQuery, private FeedsRepository $repository,) {}
+    public function __construct(private FeedsRepository $repository,) {}
 
     /** @return array */
     public function list(): array
     {
-        $rows = $this->listQuery->execute();
+        $rows = $this->repository->createQueryBuilder('n')
+            ->orderBy('n.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
 
         $items = array_map(fn(Feeds $n) => $this->mapToDto($n), $rows);
 
@@ -29,7 +31,7 @@ final class FeedService
     /** @return array */
     public function get(int $id): array
     {
-        $n = $this->listQuery->findOneById($id);
+        $n = $this->repository->find($id);
         if (!$n) {
             return ['ERROR' => 'No existe ninuna noticia con esa id'];
         }
