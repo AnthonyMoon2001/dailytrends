@@ -20,9 +20,3 @@ services:
   App\Scraper\ElMundoScraper:
     tags: ['app.scraper']
 
-  # (opcional) el preview si quieres mantenerlo explícito
-  App\Command\ScrapePreviewCommand:
-    arguments:
-      $elpais: '@App\Scraper\ElPaisScraper'
-      $elmundo: '@App\Scraper\ElMundoScraper'
-    tags: ['console.command']
