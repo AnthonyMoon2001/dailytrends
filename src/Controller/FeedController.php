@@ -116,9 +116,92 @@ final class FeedController extends AbstractController
             url: (string) $data["url"],
             image: $data["image"] ?? null,
             publishedAt: $publishedAt,
-            source: (string) $data["source"],
+            source: (string) $data["source"]
         );
 
         return $this->json($result);
+    }
+
+    #[Route("/{id<\d+>}", name: "feeds_update", methods: ["PUT"])]
+    public function update(
+        int $id,
+        Request $req,
+        ValidatorInterface $validator
+    ): JsonResponse {
+        try {
+            $data = json_decode(
+                $req->getContent(),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+        } catch (\JsonException) {
+            return $this->json(
+                ["error" => "JSON inválido"],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $constraints = new Assert\Collection(
+            fields: [
+                "title" => [new Assert\NotBlank(), new Assert\Length(max: 255)],
+                "url" => [
+                    new Assert\NotBlank(),
+                    new Assert\Url(),
+                    new Assert\Length(max: 1024),
+                ],
+                "source" => [new Assert\NotBlank(), new Assert\Length(max: 50)],
+                "image" => new Assert\Optional([
+                    new Assert\Url(),
+                    new Assert\Length(max: 1024),
+                ]),
+                "publishedAt" => new Assert\Optional([new Assert\Date()]),
+            ],
+            allowExtraFields: false
+        );
+        $violations = $validator->validate($data, $constraints);
+        if (count($violations) > 0) {
+            $errors = [];
+            foreach ($violations as $v) {
+                $errors[$v->getPropertyPath()][] = $v->getMessage();
+            }
+            return $this->json(
+                ["errors" => $errors],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+
+        $publishedAt = null;
+        if (!empty($data["publishedAt"])) {
+            $tz = new \DateTimeZone("Europe/Madrid");
+            $publishedAt = \DateTimeImmutable::createFromFormat(
+                "!Y-m-d",
+                $data["publishedAt"],
+                $tz
+            );
+            if ($publishedAt === false) {
+                return $this->json(
+                    [
+                        "errors" => [
+                            "publishedAt" => [
+                                "Formato inválido. Usa YYYY-MM-DD.",
+                            ],
+                        ],
+                    ],
+                    422
+                );
+            }
+        }
+
+        return $this->json(
+            $this->service->update(
+                id: $id,
+                title: (string) $data["title"],
+                url: (string) $data["url"],
+                image: $data["image"] ?? null,
+                publishedAt: $publishedAt,
+                source: (string) $data["source"]
+            )
+        );
     }
 }

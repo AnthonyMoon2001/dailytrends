@@ -71,7 +71,7 @@ final class FeedService
         string $url,
         ?string $image,
         ?\DateTimeImmutable $publishedAt,
-        string $source,
+        string $source
     ): array {
         $normUrl = mb_substr(trim($url), 0, 1024);
         $normImage = $image ? mb_substr(trim($image), 0, 1024) : null;
@@ -97,6 +97,51 @@ final class FeedService
         );
         $this->repository->save($feeds);
 
-        return ["item" => $this->mapToDto($feeds), "OK" => "Se ha creado correctamente"];
+        return [
+            "item" => $this->mapToDto($feeds),
+            "OK" => "Se ha creado correctamente",
+        ];
+    }
+
+    /** @return array */
+    public function update(
+        int $id,
+        string $title,
+        string $url,
+        ?string $image,
+        ?\DateTimeImmutable $publishedAt,
+        string $source
+    ): array {
+        $n = $this->repository->find($id);
+        if (!$n) {
+            return ["No se ha encontrado un feed con esa id"];
+        }
+
+        $normTitle = mb_substr(trim($title), 0, 255);
+        $normUrl = mb_substr(trim($url), 0, 1024);
+        $normImage = $image ? mb_substr(trim($image), 0, 1024) : null;
+        $normSource = mb_substr(trim($source), 0, 50);
+        $newHash = hash("sha256", $normUrl);
+
+        $conflict = $this->repository->findOneBy([
+            "source" => $normSource,
+            "urlHash" => $newHash,
+        ]);
+        if ($conflict && $conflict->getId() !== $n->getId()) {
+            throw new ConflictHttpException(
+                "Ya existe un feed con ese source+url"
+            );
+        }
+
+        $n->applyFullUpdate(
+            $normTitle,
+            $normUrl,
+            $normImage,
+            $publishedAt,
+            $normSource
+        );
+        $this->repository->save($n);
+
+        return ["item" => $this->mapToDto($n)];
     }
 }

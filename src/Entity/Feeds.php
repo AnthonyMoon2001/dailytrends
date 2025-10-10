@@ -23,11 +23,9 @@ class Feeds
     #[ORM\Column(type: "string", length: 255)]
     private string $title;
 
-    // Guarda la URL completa
     #[ORM\Column(type: "string", length: 1024)]
     private string $url;
 
-    // Hash hex de 64 chars (sha256)
     #[ORM\Column(name: "url_hash", type: "string", length: 64)]
     private string $urlHash;
 
@@ -66,6 +64,25 @@ class Feeds
         );
         $this->createdAt = $now;
         $this->updatedAt = $now;
+    }
+
+    public function applyFullUpdate(
+        string $title,
+        string $url,
+        ?string $image,
+        ?\DateTimeImmutable $publishedAt,
+        string $source
+    ): void {
+        $this->title = mb_substr($title, 0, 255);
+        $this->url = mb_substr($url, 0, 1024);
+        $this->urlHash = hash("sha256", $this->url);
+        $this->image = $image ? mb_substr($image, 0, 1024) : null;
+        $this->publishedAt = $publishedAt;
+        $this->source = mb_substr($source, 0, 50);
+        $this->updatedAt = new \DateTimeImmutable(
+            "now",
+            new \DateTimeZone("Europe/Madrid")
+        );
     }
 
     public function getId(): ?int
@@ -112,7 +129,6 @@ class Feeds
     {
         return $this->updatedAt;
     }
-
 
     public function updateFrom(
         string $title,
