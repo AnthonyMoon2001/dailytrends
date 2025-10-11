@@ -64,7 +64,10 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "test": "APP_ENV=test ./vendor/bin/phpunit",
+        "test:clean": "rm -rf var/cache/test .phpunit.cache && APP_ENV=test ./vendor/bin/phpunit"
+  
     },
     "conflict": {
         "symfony/symfony": "*"
