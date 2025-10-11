@@ -237,7 +237,7 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
   * `absolutize(base, href)` para relativas.
   * `sanitizeUrl()` elimina query noise (`utm_*`, `gclid`, `fbclid`, `intcmp`, etc.).
   * `parseSrcset()` toma el primer recurso del `srcset`.
-* **Deduplicación**: se construye `key = sha256(mb_substr(url, 0, 1024))` durante el scrape para evitar repetir en memoria; en persistencia se usa `url_hash`.
+* **Sin duplicados**: se construye `key = sha256(mb_substr(url, 0, 1024))` durante el scrape para evitar repetir en memoria; en persistencia se usa `url_hash`.
 * **Fechas**: `publishedAt = now(Europe/Madrid)` si no se extrae explícitamente.
 * **Estructura final de item**:
 
