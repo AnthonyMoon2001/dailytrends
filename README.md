@@ -240,11 +240,11 @@ Tabla `feeds`
 
 ## Documentación adicional
 
-* **ETL**: ver [ETL.md](./ETL.md) para el detalle completo del pipeline de **Extracción, Transformación y Carga** (selectores, filtros, normalización, deduplicación, upsert, orquestación).
-* **Operaciones**: ver [OPERATIONS.md](./OPERATIONS.md) para variables de entorno, ejecución dentro de Docker, troubleshooting y prácticas operativas.
+* **ETL**: ver [ETL](./ETL) para el detalle completo del pipeline de **Extracción, Transformación y Carga** (selectores, filtros, normalización, deduplicación, upsert, orquestación).
+* **Operaciones**: ver [OPERATIONS](./OPERATIONS) para variables de entorno, ejecución dentro de Docker, troubleshooting y prácticas operativas.
 
 
-# ETL.md
+# ETL
 
 ## Resumen
 
@@ -274,14 +274,14 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
   * `absolutize(base, href)` para relativas.
   * `sanitizeUrl()` elimina query noise (`utm_*`, `gclid`, `fbclid`, `intcmp`, etc.).
   * `parseSrcset()` toma el primer recurso del `srcset`.
-* **Deduplicación**: se construye `key = sha256(mb_substr(url, 0, 1024))` durante el scrape para evitar repetir en memoria; en persistencia se usa `url_hash`.
+* **Evitar duplicados**: se construye `key = sha256(mb_substr(url, 0, 1024))` durante el scrape para evitar repetir en memoria; en persistencia se usa `url_hash`.
 * **Fechas**: `publishedAt = now(Europe/Madrid)` si no se extrae explícitamente.
 * **Estructura final de item**:
 
   ```php
   [
     'title' => string,
-    'url' => string,          // ya absoluto + saneado
+    'url' => string,        
     'image' => ?string,
     'publishedAt' => ?\DateTimeImmutable,
     'source' => 'elpais'|'elmundo'
@@ -314,13 +314,6 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
 
 ---
 
-## Observabilidad
-
-* Logs: en `ScrapeAndSaveTopFeeds` se captura cualquier excepción de un scraper y se loguea con `source` + `exception`.
-* Métricas (futuro): exponer contadores por `inserted/updated/errors`.
-
----
-
 ## Calidad de datos / Riesgos
 
 * **Placeholders de imagen** (El País): se filtran `favicon`, `/iconos/`, `.svg`, `/recorte/0x0/`.
@@ -329,15 +322,7 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
 
 ---
 
-## Futuro/Mejoras
-
-* Extraer `publishedAt` real del artículo (si se desea) inspeccionando metadatos (`time[datetime]`, `meta[property="article:published_time"]`, etc.).
-* Paginar/seguir más de 5 titulares con heurística de relevancia.
-* Reintentos con backoff y límites por host.
-
----
-
-# OPERATIONS.md
+# OPERATIONS
 
 ## Objetivo
 
@@ -369,14 +354,6 @@ Para **test** (definido en `phpunit.xml.dist`):
   docker compose exec php php bin/console about
   ```
 
-* **Tests**:
-
-  ```bash
-  docker compose exec php php bin/phpunit
-  # o
-  docker compose exec php php vendor/bin/simple-phpunit
-  ```
-
 * **Errores típicos**
 
   * `/usr/bin/env: 'php': No such file or directory` → Estabas en el host, ejecuta **dentro** del contenedor (`docker compose exec php ...`).
@@ -392,6 +369,7 @@ Para **test** (definido en `phpunit.xml.dist`):
 ---
 
 ## API Docs (Nelmio)
+![alt text](image.png)
 
 El proyecto usa anotaciones de **NelmioApiDoc/OpenAPI** en el `FeedController`. Si el bundle está habilitado y ruteado, podrás acceder a la UI típica (p. ej. `/api/doc` o `/api/docs`). Ajusta rutas según tu configuración.
 
@@ -416,10 +394,3 @@ El proyecto usa anotaciones de **NelmioApiDoc/OpenAPI** en el `FeedController`. 
 * Para mockear `FeedsRepository` en `ScrapeAndSaveTopFeedsTest`, ver ejemplo de PHPUnit `getMockBuilder(...)->onlyMethods(['upsertMany'])`.
 
 ---
-
-## Roadmap sugerido
-
-* Unificar manejo de duplicados (409 en create/update).
-* Endpoint de salud `/healthz`.
-* Métricas Prometheus (inserted/updated/errors por source).
-* Cacheado de portada con TTL corto para reducir presión a medios.
