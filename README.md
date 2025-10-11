@@ -9,7 +9,6 @@
 * [Scrapers](#scrapers)
 * [Notas y decisiones](#notas-y-decisiones)
 * [Documentación adicional](#documentación-adicional)
-  $3
 
 ## Arquitectura
 
