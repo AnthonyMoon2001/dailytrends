@@ -244,7 +244,7 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
   ```php
   [
     'title' => string,
-    'url' => string,          // ya absoluto + saneado
+    'url' => string,          
     'image' => ?string,
     'publishedAt' => ?\DateTimeImmutable,
     'source' => 'elpais'|'elmundo'
