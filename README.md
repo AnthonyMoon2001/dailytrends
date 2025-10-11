@@ -14,7 +14,7 @@
 
 **Capa Web / API** (Symfony) → **Caso de uso** `ScrapeAndSaveTopFeeds` → **Repositorio** `FeedsRepository` (Doctrine) → **BD** (MySQL en prod, SQLite en test). Los scrapers (`ElPaisScraper`, `ElMundoScraper`) usan `HttpClientInterface` + `DomCrawler` y se inyectan por tag `app.scraper`.
 
-## Diagrama
+## Diagrama simple
 
 ```mermaid
 graph TD
@@ -59,6 +59,12 @@ graph TD
 * **Docker / Docker Compose**
 * PHP, Composer y extensiones ya vienen dentro del contenedor `php`.
 * Para tests se usa **SQLite** (extensión `pdo_sqlite` instalada en la imagen PHP).
+* **PHPUnit 12** como dependencia de desarrollo (dentro del contenedor):
+
+  ```bash
+  docker compose exec php composer require --dev phpunit/phpunit:^12
+  ```
+* Define `DEFAULT_URI` para los tests funcionales (se fija en `phpunit.xml.dist`).
 
 ---
 
@@ -99,37 +105,63 @@ graph TD
 
 ## Ejecutar tests
 
-> Usamos **Symfony PHPUnit Bridge** + SQLite. El `phpunit.xml.dist` define `APP_ENV=test`, `KERNEL_CLASS=App\Kernel` y `DATABASE_URL=sqlite:///%kernel.cache_dir%/test.db`.
+Usamos **PHPUnit 12 + SQLite**. Recomendado usar los **scripts de Composer** (incluyen limpieza de caché):
 
-* **Todos los tests**
+* **Todos los tests (limpiando caché)**
 
   ```bash
-  docker compose exec php php bin/phpunit
+  docker compose exec php composer run test:clean
   ```
 
-  Si no existiera `bin/phpunit`:
+* **Todos los tests (rápido, sin limpiar)**
 
   ```bash
-  docker compose exec php php vendor/bin/simple-phpunit
+  docker compose exec php composer test
   ```
 
-* **Un test concreto**
+* **Alternativa directa (sin scripts)**
 
   ```bash
-  docker compose exec php php bin/phpunit --filter ScrapeAndSaveTopFeedsTest
+  docker compose exec php sh -lc 'rm -rf var/cache/test .phpunit.cache && APP_ENV=test ./vendor/bin/phpunit'
+  ```
+
+* **Filtrar por nombre de test/clase**
+
+  ```bash
+  docker compose exec php ./vendor/bin/phpunit --filter FeedControllerTest
   ```
 
 * **Cobertura (opcional, con Xdebug)**
 
   ```bash
-  docker compose exec php sh -lc 'XDEBUG_MODE=coverage php -d xdebug.mode=coverage bin/phpunit --coverage-html var/coverage'
+  docker compose exec php sh -lc 'XDEBUG_MODE=coverage APP_ENV=test ./vendor/bin/phpunit --coverage-html var/coverage'
   ```
 
-> Tip: si ves `You must set the KERNEL_CLASS`, exporta o define en `phpunit.xml.dist`:
->
-> ```xml
-> <env name="KERNEL_CLASS" value="App\Kernel"/>
-> ```
+### Config necesaria
+
+En `composer.json` añade:
+
+```json
+{
+  "scripts": {
+    "test": "APP_ENV=test ./vendor/bin/phpunit",
+    "test:clean": "rm -rf var/cache/test .phpunit.cache && APP_ENV=test ./vendor/bin/phpunit"
+  }
+}
+```
+
+En `phpunit.xml.dist` (o `tests/bootstrap.php`), asegúrate de tener:
+
+```xml
+<php>
+  <server name="APP_ENV" value="test" force="true"/>
+  <server name="KERNEL_CLASS" value="App\\Kernel"/>
+  <server name="DATABASE_URL" value="sqlite:///%kernel.cache_dir%/test.db"/>
+  <server name="DEFAULT_URI" value="http://localhost"/>
+</php>
+```
+
+> Si ves comportamientos extraños, usa siempre `composer run test:clean` para limpiar `var/cache/test` y `.phpunit.cache` antes de correr.
 
 ---
 
@@ -205,9 +237,14 @@ Tabla `feeds`
 
 ---
 
+
 ## Documentación adicional
 
-# ETL
+* **ETL**: ver [ETL.md](./ETL.md) para el detalle completo del pipeline de **Extracción, Transformación y Carga** (selectores, filtros, normalización, deduplicación, upsert, orquestación).
+* **Operaciones**: ver [OPERATIONS.md](./OPERATIONS.md) para variables de entorno, ejecución dentro de Docker, troubleshooting y prácticas operativas.
+
+
+# ETL.md
 
 ## Resumen
 
@@ -237,14 +274,14 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
   * `absolutize(base, href)` para relativas.
   * `sanitizeUrl()` elimina query noise (`utm_*`, `gclid`, `fbclid`, `intcmp`, etc.).
   * `parseSrcset()` toma el primer recurso del `srcset`.
-* **Sin duplicados**: se construye `key = sha256(mb_substr(url, 0, 1024))` durante el scrape para evitar repetir en memoria; en persistencia se usa `url_hash`.
+* **Deduplicación**: se construye `key = sha256(mb_substr(url, 0, 1024))` durante el scrape para evitar repetir en memoria; en persistencia se usa `url_hash`.
 * **Fechas**: `publishedAt = now(Europe/Madrid)` si no se extrae explícitamente.
 * **Estructura final de item**:
 
   ```php
   [
     'title' => string,
-    'url' => string,          
+    'url' => string,          // ya absoluto + saneado
     'image' => ?string,
     'publishedAt' => ?\DateTimeImmutable,
     'source' => 'elpais'|'elmundo'
@@ -292,8 +329,15 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
 
 ---
 
+## Futuro/Mejoras
 
-# OPERATIONS
+* Extraer `publishedAt` real del artículo (si se desea) inspeccionando metadatos (`time[datetime]`, `meta[property="article:published_time"]`, etc.).
+* Paginar/seguir más de 5 titulares con heurística de relevancia.
+* Reintentos con backoff y límites por host.
+
+---
+
+# OPERATIONS.md
 
 ## Objetivo
 
