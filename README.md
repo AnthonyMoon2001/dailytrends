@@ -1,5 +1,5 @@
 * [Arquitectura](#arquitectura)
-* [Diagrama simple](#diagrama-simple)
+* [Diagrama ](#diagrama)
 * [Requisitos](#requisitos)
 * [Puesta en marcha con Docker](#puesta-en-marcha-con-docker)
 * [Comandos útiles](#comandos-útiles)
@@ -13,7 +13,7 @@
 
 **Capa Web / API** (Symfony) → **Caso de uso** `ScrapeAndSaveTopFeeds` → **Repositorio** `FeedsRepository` (Doctrine) → **BD** (MySQL en prod, SQLite en test). Los scrapers (`ElPaisScraper`, `ElMundoScraper`) usan `HttpClientInterface` + `DomCrawler` y se inyectan por tag `app.scraper`.
 
-## Diagrama simple
+## Diagrama 
 
 ```mermaid
 graph TD
