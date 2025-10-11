@@ -306,14 +306,6 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
 
 ---
 
-## Calidad de datos / Riesgos
-
-* **Placeholders de imagen** (El País): se filtran `favicon`, `/iconos/`, `.svg`, `/recorte/0x0/`.
-* **Throttling / Bans**: podría añadirse `sleep/jitter`, rotación de UA, backoff exponencial.
-* **Localización**: `accept-language` en ES para consistencia de portada.
-
----
-
 # OPERATIONS
 
 ## Objetivo
