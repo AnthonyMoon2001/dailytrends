@@ -236,13 +236,6 @@ Tabla `feeds`
 
 ---
 
-
-## Documentación adicional
-
-* **ETL**: ver [ETL](./ETL) para el detalle completo del pipeline de **Extracción, Transformación y Carga** (selectores, filtros, normalización, deduplicación, upsert, orquestación).
-* **Operaciones**: ver [OPERATIONS](./OPERATIONS) para variables de entorno, ejecución dentro de Docker, troubleshooting y prácticas operativas.
-
-
 # ETL
 
 ## Resumen
