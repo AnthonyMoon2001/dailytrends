@@ -229,11 +229,6 @@ Tabla `feeds`
 * Ambos usan headers (`user-agent`, `accept-language`) y `timeout` de 12s.
 * Limpieza/normalización con `HtmlUtils` (tidy, absolutize, sanitizeUrl, parseSrcset, isArticleUrl).
 
-**Carga (L de ETL)**
-
-* `FeedsRepository::upsertMany()` transaccional: inserta o actualiza si ya existe `source+url_hash`.
-* Devuelve resumen `{inserted, updated, errors}`.
-
 ---
 
 # ETL
@@ -371,6 +366,6 @@ El proyecto usa anotaciones de **NelmioApiDoc/OpenAPI** en el `FeedController`. 
 
 * PHP 8.x, tipado estricto en la mayoría de clases.
 * Estilo: PSR-12 (recomendado añadir PHP-CS-Fixer/PHPCS).
-* Commits: convencional (feat/fix/docs/test/chore/refactor).
+* Commits: convencional.
 
 ---
