@@ -14,7 +14,7 @@
 
 **Capa Web / API** (Symfony) → **Caso de uso** `ScrapeAndSaveTopFeeds` → **Repositorio** `FeedsRepository` (Doctrine) → **BD** (MySQL en prod, SQLite en test). Los scrapers (`ElPaisScraper`, `ElMundoScraper`) usan `HttpClientInterface` + `DomCrawler` y se inyectan por tag `app.scraper`.
 
-## Diagrama simple
+## Diagrama
 
 ```mermaid
 graph TD
@@ -202,10 +202,6 @@ Tabla `feeds`
 
 * `FeedsRepository::upsertMany()` transaccional: inserta o actualiza si ya existe `source+url_hash`.
 * Devuelve resumen `{inserted, updated, errors}`.
-
----
-
-$1
 
 ---
 
