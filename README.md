@@ -102,7 +102,37 @@ graph TD
 
 ---
 
+
+
 ## Ejecutar tests
+
+### Config necesaria
+
+En `composer.json` añade:
+
+```json
+{
+  "scripts": {
+    "test": "APP_ENV=test ./vendor/bin/phpunit",
+    "test:clean": "rm -rf var/cache/test .phpunit.cache && APP_ENV=test ./vendor/bin/phpunit"
+  }
+}
+```
+
+En `phpunit.xml.dist` (o `tests/bootstrap.php`), asegúrate de tener:
+
+```xml
+<php>
+  <server name="APP_ENV" value="test" force="true"/>
+  <server name="KERNEL_CLASS" value="App\\Kernel"/>
+  <server name="DATABASE_URL" value="sqlite:///%kernel.cache_dir%/test.db"/>
+  <server name="DEFAULT_URI" value="http://localhost"/>
+</php>
+```
+
+> Si ves comportamientos extraños, usa siempre `composer run test:clean` para limpiar `var/cache/test` y `.phpunit.cache` antes de correr.
+
+---
 
 Usamos **PHPUnit 12 + SQLite**. Recomendado usar los **scripts de Composer** (incluyen limpieza de caché):
 
@@ -136,33 +166,8 @@ Usamos **PHPUnit 12 + SQLite**. Recomendado usar los **scripts de Composer** (in
   docker compose exec php sh -lc 'XDEBUG_MODE=coverage APP_ENV=test ./vendor/bin/phpunit --coverage-html var/coverage'
   ```
 
-### Config necesaria
-
-En `composer.json` añade:
-
-```json
-{
-  "scripts": {
-    "test": "APP_ENV=test ./vendor/bin/phpunit",
-    "test:clean": "rm -rf var/cache/test .phpunit.cache && APP_ENV=test ./vendor/bin/phpunit"
-  }
-}
-```
-
-En `phpunit.xml.dist` (o `tests/bootstrap.php`), asegúrate de tener:
-
-```xml
-<php>
-  <server name="APP_ENV" value="test" force="true"/>
-  <server name="KERNEL_CLASS" value="App\\Kernel"/>
-  <server name="DATABASE_URL" value="sqlite:///%kernel.cache_dir%/test.db"/>
-  <server name="DEFAULT_URI" value="http://localhost"/>
-</php>
-```
-
-> Si ves comportamientos extraños, usa siempre `composer run test:clean` para limpiar `var/cache/test` y `.phpunit.cache` antes de correr.
-
 ---
+
 
 ## Endpoints API
 
