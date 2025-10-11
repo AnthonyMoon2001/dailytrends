@@ -292,13 +292,6 @@ Este documento detalla la **Extracción, Transformación y Carga** del pipeline 
 
 ---
 
-## Futuro/Mejoras
-
-* Extraer `publishedAt` real del artículo (si se desea) inspeccionando metadatos (`time[datetime]`, `meta[property="article:published_time"]`, etc.).
-* Paginar/seguir más de 5 titulares con heurística de relevancia.
-* Reintentos con backoff y límites por host.
-
----
 
 # OPERATIONS
 
