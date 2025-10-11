@@ -7,7 +7,6 @@
 * [Endpoints API](#endpoints-api)
 * [Modelo de datos](#modelo-de-datos)
 * [Scrapers](#scrapers)
-* [Notas y decisiones](#notas-y-decisiones)
 * [Documentación adicional](#documentación-adicional)
 
 ## Arquitectura
@@ -181,7 +180,7 @@ Base: `GET /feeds`
 
 * Valida `title`, `url`, `source`; `image` y `publishedAt` son opcionales (`YYYY-MM-DD`).
 * Duplicados se detectan por `source + url_hash(sha256(url))`.
-* En `create()` ahora mismo la capa de servicio devuelve un mensaje de duplicado en el cuerpo; `update()` lanza `409`. Ver [Notas y decisiones](#notas-y-decisiones).
+* En `create()` ahora mismo la capa de servicio devuelve un mensaje de duplicado en el cuerpo; `update()` lanza `409`.
 
 **Ejemplos**
 
