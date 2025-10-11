@@ -374,15 +374,3 @@ El proyecto usa anotaciones de **NelmioApiDoc/OpenAPI** en el `FeedController`. 
 * Commits: convencional (feat/fix/docs/test/chore/refactor).
 
 ---
-
-## Troubleshooting de tests
-
-* Ejecuta un test aislado para inspección rápida:
-
-  ```bash
-  docker compose exec php php bin/phpunit --filter HtmlUtilsTest
-  ```
-* Si un test de scrapers falla por HTML real, usa `MockHttpClient` y `MockResponse` (ya implementado en los tests).
-* Para mockear `FeedsRepository` en `ScrapeAndSaveTopFeedsTest`, ver ejemplo de PHPUnit `getMockBuilder(...)->onlyMethods(['upsertMany'])`.
-
----
